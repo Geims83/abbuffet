@@ -1,0 +1,108 @@
+﻿@inherits LayoutComponentBase
+@using abbuffet.Models
+
+<ul class="nav nav-tabs">
+    <li class="nav-item">
+        <a class="nav-link @(Stato == 0 ? "active" : "")" @onclick="(() => CambiaStato(0))" >Lista</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link @(Stato == 1 ? "active" : "")" @onclick="(() => CambiaStato(1))" >Persone</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link @(Stato == 2 ? "active" : "")" @onclick="(() => CambiaStato(2))"> Piatti</a>
+    </li>
+</ul>
+
+@if (Stato == 0)
+{
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Piatto</th>
+                    <th>Evaso</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Ordini != null)
+                {
+                    @foreach (var o in Ordini.OrderBy(s => (s.Utente, s.Piatto)))
+                    {
+                        var idordine = o.IdOrdine.ToString();
+                        <tr>
+                            <td>@o.Utente</td>
+                            <td>@o.Piatto</td>
+                            <td><input type="checkbox" checked="@(o.Evaso ?? false)" @onclick="(() => Evadi(idordine))"></td>
+                            <td><button class="btn btn-warning btn-sm" @onclick="(() => Cancella(idordine))">-</button></td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+}
+else if (Stato == 1)
+{
+<div>
+    <ul>
+    @foreach (var g in Ordini.Select(o => (o.Utente, o.Piatto, (o.Evaso ?? false))).GroupBy(g => g.Utente))
+    {
+        <li>@g.Key (@g.Count())</li>
+        <ol>
+            @foreach (var d in g)
+            {
+                <li style="@(d.Item3? "text-decoration: line-through" : "")">@d.Item2</li>
+            }
+        </ol>
+    }
+    </ul>
+    </div>
+}
+else if (Stato == 2)
+{
+    <div>
+    <ul>
+        @foreach (var g in Ordini.Select(o => (o.Piatto, o.Utente, (o.Evaso ?? false))).GroupBy(g => g.Piatto))
+        {
+            <li>@g.Key (@g.Count())</li>
+            <ol>
+                @foreach (var d in g)
+                {
+                    <li style="@(d.Item3? "text-decoration: line-through" : "")">@d.Item2</li>
+                }
+            </ol>
+        }
+    </ul>
+    </div>
+}
+
+
+
+@code {
+
+    [Parameter] public Tavolo Tavolo { get; set; }
+
+    [Parameter] public List<Ordine> Ordini { get; set; }
+
+    [Parameter] public int Stato { get; set; }
+
+    [Parameter] public Func<string, Task> EvadiOrdine {get;set;}
+
+    [Parameter] public Func<string, Task> CancellaOrdine {get;set;}
+
+    async Task CambiaStato(int s)
+    {
+        Stato = s;
+    }
+
+    async Task Evadi(string idOrdine)
+    {
+        await EvadiOrdine(idOrdine);
+    }
+
+    async Task Cancella (string idOrdine)
+    {
+        await CancellaOrdine(idOrdine);
+    }
+
+}

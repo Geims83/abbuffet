@@ -1,0 +1,7 @@
+@page "/creatavolo"
+@inherits CreateTableBase
+
+<h1>Crea Tavolo</h1>
+<input @bind="@Nome" />
+<button class="btn btn-primary" @onclick="Aggiungi">OK</button>
+<button class="btn btn-secondary" @onclick="Back">Indietro</button>

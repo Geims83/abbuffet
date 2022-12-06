@@ -1,0 +1,25 @@
+﻿@page "/table/{IdTavolo}"
+@inherits TableBase
+
+@if (_tavolo == null)
+{
+    <em>Caricamento...</em>
+}
+else
+{
+
+    <div>
+        <span style="float: right;" ><button class="btn btn-danger" @onclick="GoOnline">Go Online!</button></span>
+        <h1>@_tavolo.Descrizione</h1>
+        </div>
+
+    <div class="card">
+        <div class="card-body">
+            <input type="text" @bind-value="@_utente" placeholder="Persona" />
+            <input type="text" @bind-value="@_piatto" placeholder="Piatto" />
+            <button @onclick="AggiungiOrdine" class="btn btn-primary btn-sm">+</button>
+        </div>
+    </div>
+    
+    <TableVisualizer Tavolo=@_tavolo Stato=0 Ordini=@_ordini EvadiOrdine=@EvadiOrdine CancellaOrdine=@CancellaOrdine/>
+}
